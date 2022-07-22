@@ -1,11 +1,7 @@
 package com.example.demo;
 
-import com.example.demo.repository.StudentRepository;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import com.example.demo.Entity.*;
-import org.springframework.context.annotation.ComponentScan;
 
 import java.sql.*;
 
@@ -14,19 +10,20 @@ public class DemoApplication {
 
 	public static void main(String[] args) throws Exception {
 		SpringApplication.run(DemoApplication.class, args);
-		Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/mydb", "root", "thangthang1!");
-		String query = "SELECT * FROM bangchamcong;";
+		Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/newmodel", "root", "thangthang1!");
+		String query = "select id_nv, nv.phongban_id, hoten, tenphong, count(if(gioden != cast('0:00' as time), 1, Null)) chamcong from bangchamcong\n" +
+				"inner join nhanvien nv on nv.id = bangchamcong.id_nv\n" +
+				"inner join phongban pb on pb.id = nv.phongban_id\n" +
+				"group by id_nv";
 		Statement st = conn.createStatement();
 		ResultSet rs = st.executeQuery(query);
 		while (rs.next()) {
-			int id = rs.getInt("id");
 			int id_nv = rs.getInt("id_nv");
-			int id_pb = rs.getInt("id_pb");
-			Time gioden = rs.getTime("gioden");
-			Time giove = rs.getTime("giove");
-			Date ngay = rs.getDate("ngay");
-			// print the results
-			System.out.format("%s | %s | %s | %s | %s | %s\n", id, id_nv, id_pb, gioden, giove, ngay);
+			int phongban_id = rs.getInt("phongban_id");
+			String hoten = rs.getString("hoten");
+			String tenphong = rs.getString("tenphong");
+			int chamcong = rs.getInt("chamcong");
+			System.out.format("| %s | %s | %s | %s | %s |\n", id_nv, phongban_id, hoten, tenphong, chamcong);
 		}
 		st.close();
 	}
